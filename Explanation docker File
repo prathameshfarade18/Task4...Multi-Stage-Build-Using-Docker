@@ -1,0 +1,16 @@
+Build Stage (FROM node AS build):
+1.FROM node AS build: Starts with the official Node.js image and names this stage build.
+2.WORKDIR /usr/src/app: Sets the working directory inside the container to /usr/src/app.
+3.COPY package.json .: Copies package.json to the working directory inside the container.
+4.COPY . .: Copies all the application files (including index.js) into the container.
+4.RUN npm install: Installs the dependencies listed in package.json.
+5.CMD ["node","index.js"]: Defines the default command to run the Node.js app using node index.js (used during the build stage).
+
+Production Stage (FROM node AS production):
+1.FROM node AS production: Starts a new stage using the official Node.js image, named production.
+2.WORKDIR /usr/src/app: Sets the working directory inside the container for the production stage.
+3.COPY --from=build /usr/src/app/ ./dist: Copies the built app from the build stage into the dist folder of the production stage.
+4.*COPY --from=build /usr/src/app/package.json ./**: Copies the package.json and package-lock.json from the build stage.
+5.RUN npm install: Installs the production dependencies.
+6.EXPOSE 3000: Exposes port 3000 for the application to listen on.
+7.CMD ["node","dist/index.js"]: Specifies the default command to run the app in production using node dist/index.js.
